@@ -4,11 +4,10 @@ ENV RUBY_MAJOR="3.1" \
   RUBY_VERSION="3.1.2" \
   RUBYGEMS_VERSION="3.3.24"
 
-WORKDIR /tmp
+ARG PARALLELISM
+ENV PARALLELISM ${PARALLELISM:-4}
 
-# RUN apt update
-# RUN apt search postgresql-client
-# RUN exit 1
+WORKDIR /tmp
 
 # install and uninstall packages
 RUN apt-get update && \
