@@ -9,6 +9,7 @@ build:
 		-t aoe4world/ruby:latest \
 		-t aoe4world/ruby:3.1 \
 		--build-arg PARALLELISM=${PARALLELISM} \
+		--squash \
 		.
 
 deploy:
