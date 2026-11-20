@@ -1,8 +1,9 @@
-FROM debian
+FROM debian:bookworm
 
-ENV RUBY_MAJOR="3.2" \
-  RUBY_VERSION="3.2.2" \
-  RUBYGEMS_VERSION="3.4.19"
+ENV RUBY_MAJOR="3.3" \
+  RUBY_VERSION="3.3.14" \
+  RUBY_SHA256="d0438ee291b0cacaf97c7a71df4c939d7f3265c8c2d1b8ffe27311f71fc680b0" \
+  RUBYGEMS_VERSION="3.5.22"
 
 ARG PARALLELISM
 ENV PARALLELISM ${PARALLELISM:-4}
@@ -13,10 +14,11 @@ WORKDIR /tmp
 RUN apt-get update && \
   apt-get install -y gnupg2 curl apt-transport-https git ca-certificates libssl-dev gcc make zlib1g-dev libjemalloc-dev libjemalloc2 libpq-dev libyaml-dev && \
   apt-get remove --purge -y anacron cron openssh-server postfix && \
-  apt-get autoremove --purge -
+  apt-get autoremove --purge -y
 
 # install ruby
-RUN curl -o ruby.tgz "https://cache.ruby-lang.org/pub/ruby/${RUBY_MAJOR}/ruby-${RUBY_VERSION}.tar.gz" && \
+RUN curl -fSL -o ruby.tgz "https://cache.ruby-lang.org/pub/ruby/${RUBY_MAJOR}/ruby-${RUBY_VERSION}.tar.gz" && \
+  echo "${RUBY_SHA256}  ruby.tgz" | sha256sum -c - && \
   tar -xzf ruby.tgz && \
   cd ruby-${RUBY_VERSION} && \
   ./configure --enable-shared --with-jemalloc --disable-install-doc && \
@@ -24,7 +26,7 @@ RUN curl -o ruby.tgz "https://cache.ruby-lang.org/pub/ruby/${RUBY_MAJOR}/ruby-${
   make install
 
 # install node, yarn, and other tools
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get update -qq && \
     apt-get install -y postgresql-client nodejs redis-tools && \
     npm install -g yarn
